@@ -29,9 +29,6 @@ import { machine } from "./lib/machine/machine";
 
 const machineOptions: ConfigureOptions = {
     requiredConfigurationValues: [
-        "sdm.docker.hub.registry",
-        "sdm.docker.hub.user",
-        "sdm.docker.hub.password",
     ],
 };
 

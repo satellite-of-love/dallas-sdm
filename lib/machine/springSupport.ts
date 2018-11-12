@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-import {
-    asSpawnCommand,
-    GitHubRepoRef,
-} from "@atomist/automation-client";
-import { SoftwareDeliveryMachine } from "@atomist/sdm";
-import { isInLocalMode } from "@atomist/sdm-core";
-import {
-    DefaultDockerImageNameCreator,
-    DockerOptions,
-} from "@atomist/sdm-pack-docker";
-import { singleIssuePerCategoryManaging } from "@atomist/sdm-pack-issue";
+import {GitHubRepoRef,} from "@atomist/automation-client";
+import {SoftwareDeliveryMachine} from "@atomist/sdm";
+import {isInLocalMode} from "@atomist/sdm-core";
+import {singleIssuePerCategoryManaging} from "@atomist/sdm-pack-issue";
 import {
     mavenBuilder,
-    MavenProjectIdentifier,
     ReplaceReadmeTitle,
     SetAtomistTeamInApplicationYml,
     springFormat,
@@ -36,39 +28,9 @@ import {
     springSupport,
     TransformSeedToCustomProject,
 } from "@atomist/sdm-pack-spring";
-import { SuggestAddingDockerfile } from "../commands/addDockerfile";
-import {
-    autofix,
-    build,
-    codeInspection,
-    dockerBuild,
-    productionDeployment,
-    publish,
-    releaseArtifact,
-    releaseDocker,
-    releaseDocs,
-    releaseTag,
-    releaseVersion,
-    stagingDeployment,
-    version,
-} from "./goals";
-import {
-    kubernetesDeploymentData,
-    kubernetesDeploymentSpecCreator,
-} from "./k8Support";
-import {
-    MavenDefaultOptions,
-    MavenProjectVersioner,
-    MvnPackage,
-    MvnVersion,
-    noOpImplementation,
-} from "./maven";
-import {
-    DockerPull,
-    executeReleaseDocker,
-    executeReleaseTag,
-    executeReleaseVersion,
-} from "./release";
+import {SuggestAddingDockerfile} from "../commands/addDockerfile";
+import {autofix, build, codeInspection, publish, releaseArtifact, releaseDocs, version,} from "./goals";
+import {MavenDefaultOptions, MavenProjectVersioner, noOpImplementation,} from "./maven";
 
 export function addSpringSupport(sdm: SoftwareDeliveryMachine) {
 
@@ -81,32 +43,10 @@ export function addSpringSupport(sdm: SoftwareDeliveryMachine) {
 
     version.withVersioner(MavenProjectVersioner);
 
-    dockerBuild.with({
-        imageNameCreator: DefaultDockerImageNameCreator,
-        options: {
-            ...sdm.configuration.sdm.docker.hub as DockerOptions,
-            dockerfileFinder: async () => "Dockerfile",
-        },
-    })
-        .withProjectListener(MvnVersion)
-        .withProjectListener(MvnPackage);
-
     publish.with({
         ...MavenDefaultOptions,
         name: "mvn-publish",
         goalExecutor: noOpImplementation("Publish"),
-    });
-
-    stagingDeployment.with({
-        name: "staging-deployment",
-        deploymentData: kubernetesDeploymentData(sdm),
-        deploymentSpecCreator: kubernetesDeploymentSpecCreator(sdm),
-    });
-
-    productionDeployment.with({
-        name: "production-deployment",
-        deploymentData: kubernetesDeploymentData(sdm),
-        deploymentSpecCreator: kubernetesDeploymentSpecCreator(sdm),
     });
 
     releaseArtifact.with({
@@ -115,34 +55,10 @@ export function addSpringSupport(sdm: SoftwareDeliveryMachine) {
         goalExecutor: noOpImplementation("ReleaseArtifact"),
     });
 
-    releaseDocker.with({
-        ...MavenDefaultOptions,
-        name: "docker-release",
-        goalExecutor: executeReleaseDocker(
-            {
-                ...sdm.configuration.sdm.docker.hub as DockerOptions,
-            }),
-    })
-        .withProjectListener(DockerPull);
-
-    releaseTag.with({
-        ...MavenDefaultOptions,
-        name: "release-tag",
-        goalExecutor: executeReleaseTag(),
-    });
-
     releaseDocs.with({
         ...MavenDefaultOptions,
         name: "release-docs",
         goalExecutor: noOpImplementation("ReleaseDocs"),
-    });
-
-    releaseVersion.with({
-        ...MavenDefaultOptions,
-        name: "mvn-release-version",
-        goalExecutor: executeReleaseVersion(MavenProjectIdentifier, asSpawnCommand("mvn build-helper:parse-version versions:set -DnewVersion=" +
-            "\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}" +
-            "-\${parsedVersion.qualifier} versions:commit")),
     });
 
     sdm.addGeneratorCommand<SpringProjectCreationParameters>({

@@ -24,38 +24,19 @@ import {
     ToDefaultBranch,
     whenPushSatisfies,
 } from "@atomist/sdm";
-import {
-    createSoftwareDeliveryMachine,
-    gitHubGoalStatus,
-    goalState,
-    IsGitHubAction,
-} from "@atomist/sdm-core";
-import { buildAwareCodeTransforms } from "@atomist/sdm-pack-build";
-import { HasDockerfile } from "@atomist/sdm-pack-docker";
-import { IssueSupport } from "@atomist/sdm-pack-issue";
-import {
-    HasSpringBootApplicationClass,
-    HasSpringBootPom,
-    IsMaven,
-} from "@atomist/sdm-pack-spring";
-import { AddDockerfile } from "../commands/addDockerfile";
-import {
-    build,
-    buildGoals,
-    checkGoals,
-    dockerGoals,
-    productionDeployGoals,
-    stagingDeployGoals,
-} from "./goals";
-import { IsReleaseCommit } from "./release";
-import { addSpringSupport } from "./springSupport";
+import {createSoftwareDeliveryMachine, gitHubGoalStatus, goalState,} from "@atomist/sdm-core";
+import {buildAwareCodeTransforms} from "@atomist/sdm-pack-build";
+import {IssueSupport} from "@atomist/sdm-pack-issue";
+import {HasSpringBootApplicationClass, HasSpringBootPom, IsMaven,} from "@atomist/sdm-pack-spring";
+import {build, buildGoals, checkGoals, pcfProductionDeploymentGoals, pcfStagingDeploymentGoals, stagingDeployGoals,} from "./goals";
+import {IsReleaseCommit} from "./release";
+import {addSpringSupport} from "./springSupport";
+import {HasCloudFoundryManifest} from "@atomist/sdm-pack-cloudfoundry";
 
-export function machine(
-    configuration: SoftwareDeliveryMachineConfiguration,
-): SoftwareDeliveryMachine {
+export function machine(configuration: SoftwareDeliveryMachineConfiguration): SoftwareDeliveryMachine {
 
     const sdm = createSoftwareDeliveryMachine({
-            name: "Kubernetes Demo Software Delivery Machine",
+            name: "Spring/PCF Demo Software Delivery Machine",
             configuration,
         },
     );
@@ -69,14 +50,14 @@ export function machine(
         whenPushSatisfies(IsReleaseCommit).setGoals(ImmaterialGoals.andLock()),
         whenPushSatisfies(IsMaven).setGoals(checkGoals),
         whenPushSatisfies(IsMaven).setGoals(buildGoals),
-        whenPushSatisfies(IsMaven, HasDockerfile).setGoals(dockerGoals),
+        // whenPushSatisfies(IsMaven, HasDockerfile).setGoals(dockerGoals),
         whenPushSatisfies(HasSpringBootPom, HasSpringBootApplicationClass,
-            ToDefaultBranch, HasDockerfile).setGoals(stagingDeployGoals),
+            ToDefaultBranch, HasCloudFoundryManifest).setGoals(stagingDeployGoals),
         whenPushSatisfies(HasSpringBootPom, HasSpringBootApplicationClass,
-            ToDefaultBranch, HasDockerfile, not(IsGitHubAction)).setGoals(productionDeployGoals),
+            ToDefaultBranch, HasCloudFoundryManifest).setGoals(pcfStagingDeploymentGoals),
+        whenPushSatisfies(HasSpringBootPom, HasSpringBootApplicationClass,
+            ToDefaultBranch, HasCloudFoundryManifest).setGoals(pcfProductionDeploymentGoals),
     );
-
-    sdm.addCodeTransformCommand(AddDockerfile);
 
     addSpringSupport(sdm);
 

@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-// GOAL Definition
-
 import {
     AutoCodeInspection,
     Autofix,
@@ -27,13 +25,12 @@ import {
     ProductionEnvironment,
     PushImpact,
 } from "@atomist/sdm";
-import {
-    Tag,
-    Version,
-} from "@atomist/sdm-core";
-import { Build } from "@atomist/sdm-pack-build";
-import { DockerBuild } from "@atomist/sdm-pack-docker";
-import { KubernetesDeploy } from "@atomist/sdm-pack-k8";
+import {Tag, Version} from "@atomist/sdm-core";
+import {Build} from "@atomist/sdm-pack-build";
+import {DockerBuild} from "@atomist/sdm-pack-docker";
+import {KubernetesDeploy} from "@atomist/sdm-pack-k8";
+import {MavenPerBranchDeployment} from "@atomist/sdm-pack-spring";
+import {cfDeployment, cfDeploymentStaging} from "./pcfSupport";
 
 export const autofix = new Autofix();
 export const version = new Version();
@@ -118,8 +115,6 @@ export const releaseVersion = new GoalWithFulfillment({
 
 export const cancel = new Cancel({ goals: [autofix, build, dockerBuild, publish] });
 
-// GOALSET Definition
-
 // Just running review and autofix
 export const checkGoals = goals("checks")
     .plan(cancel, autofix, version, fingerprint, pushImpact)
@@ -138,6 +133,17 @@ export const dockerGoals = goals("docker build")
 export const stagingDeployGoals = goals("deploy")
     .plan(stagingDeployment).after(dockerBuild);
 
-export const productionDeployGoals = goals("prod deploy")
-    .plan(productionDeployment).after(stagingDeployment)
-    .plan(releaseArtifact, releaseDocker, releaseDocs, releaseTag, releaseVersion).after(productionDeployment);
+// export const productionDeployGoals = goals("prod deploy")
+//     .plan(productionDeployment).after(stagingDeployment)
+//     .plan(releaseArtifact, releaseDocker, releaseDocs, releaseTag, releaseVersion).after(productionDeployment);
+
+const mavenDeploy = new MavenPerBranchDeployment();
+
+export const localDeploymentGoals = goals("local deploy")
+    .plan(mavenDeploy).after(buildGoals);
+
+export const pcfStagingDeploymentGoals = goals("pcf staging")
+    .plan(cfDeploymentStaging).after(buildGoals);
+
+export const pcfProductionDeploymentGoals = goals("pcf prod")
+    .plan(cfDeployment).after(cfDeploymentStaging);
