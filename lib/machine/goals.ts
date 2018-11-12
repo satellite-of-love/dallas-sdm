@@ -27,8 +27,6 @@ import {
 } from "@atomist/sdm";
 import {Tag, Version} from "@atomist/sdm-core";
 import {Build} from "@atomist/sdm-pack-build";
-import {DockerBuild} from "@atomist/sdm-pack-docker";
-import {KubernetesDeploy} from "@atomist/sdm-pack-k8";
 import {MavenPerBranchDeployment} from "@atomist/sdm-pack-spring";
 import {cfDeployment, cfDeploymentStaging} from "./pcfSupport";
 
@@ -41,15 +39,6 @@ export const pushImpact = new PushImpact();
 export const build = new Build();
 export const tag = new Tag();
 
-export const dockerBuild = new DockerBuild();
-
-export const stagingDeployment = new KubernetesDeploy({
-    environment: "testing",
-});
-export const productionDeployment = new KubernetesDeploy({
-    environment: "production",
-    preApproval: true,
-});
 
 export const publish = new GoalWithFulfillment({
     uniqueName: "Publish",
@@ -113,7 +102,7 @@ export const releaseVersion = new GoalWithFulfillment({
     failedDescription: "Incrementing version failure",
 });
 
-export const cancel = new Cancel({ goals: [autofix, build, dockerBuild, publish] });
+export const cancel = new Cancel({ goals: [autofix, build] });
 
 // Just running review and autofix
 export const checkGoals = goals("checks")
@@ -124,14 +113,6 @@ export const checkGoals = goals("checks")
 export const buildGoals = goals("build")
     .plan(build).after(autofix)
     .plan(publish).after(build);
-
-// Build including docker build
-export const dockerGoals = goals("docker build")
-    .plan(dockerBuild).after(build);
-
-// Docker build and testing and production kubernetes deploy
-export const stagingDeployGoals = goals("deploy")
-    .plan(stagingDeployment).after(dockerBuild);
 
 // export const productionDeployGoals = goals("prod deploy")
 //     .plan(productionDeployment).after(stagingDeployment)

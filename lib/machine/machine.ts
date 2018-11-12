@@ -28,8 +28,7 @@ import {createSoftwareDeliveryMachine, gitHubGoalStatus, goalState,} from "@atom
 import {buildAwareCodeTransforms} from "@atomist/sdm-pack-build";
 import {IssueSupport} from "@atomist/sdm-pack-issue";
 import {HasSpringBootApplicationClass, HasSpringBootPom, IsMaven,} from "@atomist/sdm-pack-spring";
-import {build, buildGoals, checkGoals, pcfProductionDeploymentGoals, pcfStagingDeploymentGoals, stagingDeployGoals,} from "./goals";
-import {IsReleaseCommit} from "./release";
+import {build, buildGoals, checkGoals, localDeploymentGoals, pcfProductionDeploymentGoals, pcfStagingDeploymentGoals} from "./goals";
 import {addSpringSupport} from "./springSupport";
 import {HasCloudFoundryManifest} from "@atomist/sdm-pack-cloudfoundry";
 
@@ -47,12 +46,11 @@ export function machine(configuration: SoftwareDeliveryMachineConfiguration): So
             files: ["Dockerfile"],
             directories: [".atomist", ".github"],
         }))).setGoals(ImmaterialGoals.andLock()),
-        whenPushSatisfies(IsReleaseCommit).setGoals(ImmaterialGoals.andLock()),
         whenPushSatisfies(IsMaven).setGoals(checkGoals),
         whenPushSatisfies(IsMaven).setGoals(buildGoals),
         // whenPushSatisfies(IsMaven, HasDockerfile).setGoals(dockerGoals),
         whenPushSatisfies(HasSpringBootPom, HasSpringBootApplicationClass,
-            ToDefaultBranch, HasCloudFoundryManifest).setGoals(stagingDeployGoals),
+            ToDefaultBranch, HasCloudFoundryManifest).setGoals(localDeploymentGoals),
         whenPushSatisfies(HasSpringBootPom, HasSpringBootApplicationClass,
             ToDefaultBranch, HasCloudFoundryManifest).setGoals(pcfStagingDeploymentGoals),
         whenPushSatisfies(HasSpringBootPom, HasSpringBootApplicationClass,
