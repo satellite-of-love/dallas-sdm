@@ -59,6 +59,18 @@ export function machine(configuration: SoftwareDeliveryMachineConfiguration): So
 
     addSpringSupport(sdm);
 
+    sdm.addCodeTransformCommand({
+        name: "counter",
+        intent: "add count",
+        parameters: {
+            filename: { description: "name of filecount file", pattern: /[A-Za-z0-9\.]+/, }
+        },
+        transform: async p => {
+            const fc = await p.totalFileCount();
+            await p.addFile("filecount.md", `There are ${fc} files in this project`);
+        },
+    });
+
     // Brings in add cloud foundry manifest
     sdm.addExtensionPacks(CloudFoundrySupport({}));
 
