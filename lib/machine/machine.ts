@@ -50,7 +50,7 @@ export function machine(configuration: SoftwareDeliveryMachineConfiguration): So
         whenPushSatisfies(IsMaven).setGoals(buildGoals),
         // whenPushSatisfies(IsMaven, HasDockerfile).setGoals(dockerGoals),
         whenPushSatisfies(HasSpringBootPom, HasSpringBootApplicationClass,
-            ToDefaultBranch, HasCloudFoundryManifest).setGoals(localDeploymentGoals),
+            ToDefaultBranch).setGoals(localDeploymentGoals),
         whenPushSatisfies(HasSpringBootPom, HasSpringBootApplicationClass,
             ToDefaultBranch, HasCloudFoundryManifest).setGoals(pcfStagingDeploymentGoals),
         whenPushSatisfies(HasSpringBootPom, HasSpringBootApplicationClass,

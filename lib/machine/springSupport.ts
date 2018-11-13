@@ -66,6 +66,7 @@ export function addSpringSupport(sdm: SoftwareDeliveryMachine) {
             springStyle: true,
             cloudNative: true,
         },
+        springFormat: false,
         reviewListeners: isInLocalMode() ? [] : [
             singleIssuePerCategoryManaging("sdm-pack-spring"),
         ],
