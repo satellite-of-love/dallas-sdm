@@ -29,8 +29,8 @@ import {
     TransformSeedToCustomProject,
 } from "@atomist/sdm-pack-spring";
 import {SuggestAddingDockerfile} from "../commands/addDockerfile";
-import {autofix, build, codeInspection, publish, releaseArtifact, releaseDocs, version,} from "./goals";
-import {MavenDefaultOptions, MavenProjectVersioner, noOpImplementation,} from "./maven";
+import {autofix, build, codeInspection} from "./goals";
+import {MavenDefaultOptions} from "./maven";
 
 export function addSpringSupport(sdm: SoftwareDeliveryMachine) {
 
@@ -39,26 +39,6 @@ export function addSpringSupport(sdm: SoftwareDeliveryMachine) {
     build.with({
         ...MavenDefaultOptions,
         builder: mavenBuilder(),
-    });
-
-    version.withVersioner(MavenProjectVersioner);
-
-    publish.with({
-        ...MavenDefaultOptions,
-        name: "mvn-publish",
-        goalExecutor: noOpImplementation("Publish"),
-    });
-
-    releaseArtifact.with({
-        ...MavenDefaultOptions,
-        name: "mvn-release-artifact",
-        goalExecutor: noOpImplementation("ReleaseArtifact"),
-    });
-
-    releaseDocs.with({
-        ...MavenDefaultOptions,
-        name: "release-docs",
-        goalExecutor: noOpImplementation("ReleaseDocs"),
     });
 
     sdm.addGeneratorCommand<SpringProjectCreationParameters>({
