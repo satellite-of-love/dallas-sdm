@@ -59,15 +59,15 @@ export function machine(configuration: SoftwareDeliveryMachineConfiguration): So
 
     addSpringSupport(sdm);
 
-    sdm.addCodeTransformCommand({
+    sdm.addCodeTransformCommand<{filename: string}>({
         name: "counter",
         intent: "add count",
         parameters: {
             filename: { description: "name of filecount file", pattern: /[A-Za-z0-9\.]+/, }
         },
-        transform: async p => {
+        transform: async (p, ci) => {
             const fc = await p.totalFileCount();
-            await p.addFile("filecount.md", `There are ${fc} files in this project`);
+            await p.addFile(ci.parameters.filename, `There are ${fc} files in this project`);
         },
     });
 
