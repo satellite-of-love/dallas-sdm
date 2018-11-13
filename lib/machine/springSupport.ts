@@ -22,7 +22,6 @@ import {
     mavenBuilder,
     ReplaceReadmeTitle,
     SetAtomistTeamInApplicationYml,
-    springFormat,
     SpringProjectCreationParameterDefinitions,
     SpringProjectCreationParameters,
     springSupport,
@@ -32,8 +31,6 @@ import {autofix, build, codeInspection} from "./goals";
 import {MavenDefaultOptions} from "./maven";
 
 export function addSpringSupport(sdm: SoftwareDeliveryMachine) {
-
-    autofix.with(springFormat(sdm.configuration));
 
     build.with({
         ...MavenDefaultOptions,
