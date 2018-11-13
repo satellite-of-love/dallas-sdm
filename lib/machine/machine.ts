@@ -30,7 +30,7 @@ import {IssueSupport} from "@atomist/sdm-pack-issue";
 import {HasSpringBootApplicationClass, HasSpringBootPom, IsMaven,} from "@atomist/sdm-pack-spring";
 import {build, buildGoals, checkGoals, localDeploymentGoals, pcfProductionDeploymentGoals, pcfStagingDeploymentGoals} from "./goals";
 import {addSpringSupport} from "./springSupport";
-import {HasCloudFoundryManifest} from "@atomist/sdm-pack-cloudfoundry";
+import {CloudFoundrySupport, HasCloudFoundryManifest} from "@atomist/sdm-pack-cloudfoundry";
 
 export function machine(configuration: SoftwareDeliveryMachineConfiguration): SoftwareDeliveryMachine {
 
@@ -58,6 +58,9 @@ export function machine(configuration: SoftwareDeliveryMachineConfiguration): So
     );
 
     addSpringSupport(sdm);
+
+    // Brings in add cloud foundry manifest
+    sdm.addExtensionPacks(CloudFoundrySupport({}));
 
     sdm.addGoalApprovalRequestVoter(githubTeamVoter());
     sdm.addExtensionPacks(
