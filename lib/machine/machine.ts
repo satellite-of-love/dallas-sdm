@@ -62,7 +62,7 @@ export function machine(configuration: SoftwareDeliveryMachineConfiguration): So
     // Brings in add cloud foundry manifest
     sdm.addExtensionPacks(CloudFoundrySupport({}));
 
-    sdm.addGoalApprovalRequestVoter(githubTeamVoter());
+    // sdm.addGoalApprovalRequestVoter(githubTeamVoter());
     sdm.addExtensionPacks(
         buildAwareCodeTransforms({
             buildGoal: build,
