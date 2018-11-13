@@ -28,7 +28,6 @@ import {
     springSupport,
     TransformSeedToCustomProject,
 } from "@atomist/sdm-pack-spring";
-import {SuggestAddingDockerfile} from "../commands/addDockerfile";
 import {autofix, build, codeInspection} from "./goals";
 import {MavenDefaultOptions} from "./maven";
 
@@ -54,7 +53,6 @@ export function addSpringSupport(sdm: SoftwareDeliveryMachine) {
         ],
     });
 
-    sdm.addChannelLinkListener(SuggestAddingDockerfile);
     sdm.addExtensionPacks(springSupport({
         inspectGoal: codeInspection,
         autofixGoal: autofix,
@@ -66,7 +64,7 @@ export function addSpringSupport(sdm: SoftwareDeliveryMachine) {
             springStyle: true,
             cloudNative: true,
         },
-        springFormat: false,
+        springFormat: true,
         reviewListeners: isInLocalMode() ? [] : [
             singleIssuePerCategoryManaging("sdm-pack-spring"),
         ],
