@@ -71,6 +71,20 @@ export function machine(configuration: SoftwareDeliveryMachineConfiguration): So
     },
     );
 
+    pushImpactGoal.withListener(async inv => {
+        return inv.addressChannels("I love your new shirt");
+    });
+
+    const t: CodeTransform = async (project, inv) => {
+        const tc = await project.totalFileCount();
+        await inv.addressChannels("There are " + tc + " total files");
+        return project.addFile("fileCount.txt", "count: " + tc);
+    };
+
+    autofixGoal.withTransform(t);
+
+    sdm.addCodeTransformCommand({ intent: "record file count", name: "countMe", transform: t });
+
     sdm.withPushRules(
         whenPushSatisfies(AnyPush).setGoals(checkGoals),
         whenPushSatisfies(not(isMaterialChange({
