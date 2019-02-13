@@ -1,12 +1,12 @@
 {
-  "name": "@deep-south-software/demo-sdm",
+  "name": "@jessitron/dallas-sdm",
   "version": "1.0.1",
   "description": "an Atomist SDM with a PCF Spring/Java focus",
   "author": "Atomist, Inc.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/deep-south-software/demo-sdm.git"
+    "url": "https://github.com/satellite-of-love/dallas-sdm.git"
   },
   "keywords": [
     "atomist",
@@ -15,9 +15,9 @@
     "pcf",
     "sdm"
   ],
-  "homepage": "https://github.com/deep-south-software/demo-sdm#readme",
+  "homepage": "https://github.com/satellite-of-love/dallas-sdm#readme",
   "bugs": {
-    "url": "https://github.com/deep-south-software/demo-sdm/issues"
+    "url": "https://github.com/satellite-of-love/dallas-sdm/issues"
   },
   "dependencies": {
     "@atomist/automation-client": "1.1.0-master.20181110132646",

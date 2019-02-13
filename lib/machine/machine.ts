@@ -24,20 +24,20 @@ import {
     ToDefaultBranch,
     whenPushSatisfies,
 } from "@atomist/sdm";
-import {createSoftwareDeliveryMachine, gitHubGoalStatus, goalState,} from "@atomist/sdm-core";
-import {buildAwareCodeTransforms} from "@atomist/sdm-pack-build";
-import {IssueSupport} from "@atomist/sdm-pack-issue";
-import {HasSpringBootApplicationClass, HasSpringBootPom, IsMaven,} from "@atomist/sdm-pack-spring";
-import {build, buildGoals, checkGoals, localDeploymentGoals, pcfProductionDeploymentGoals, pcfStagingDeploymentGoals} from "./goals";
-import {addSpringSupport} from "./springSupport";
-import {CloudFoundrySupport, HasCloudFoundryManifest} from "@atomist/sdm-pack-cloudfoundry";
+import { createSoftwareDeliveryMachine, gitHubGoalStatus, goalState, } from "@atomist/sdm-core";
+import { buildAwareCodeTransforms } from "@atomist/sdm-pack-build";
+import { IssueSupport } from "@atomist/sdm-pack-issue";
+import { HasSpringBootApplicationClass, HasSpringBootPom, IsMaven, } from "@atomist/sdm-pack-spring";
+import { build, buildGoals, checkGoals, localDeploymentGoals, pcfProductionDeploymentGoals, pcfStagingDeploymentGoals } from "./goals";
+import { addSpringSupport } from "./springSupport";
+import { CloudFoundrySupport, HasCloudFoundryManifest } from "@atomist/sdm-pack-cloudfoundry";
 
 export function machine(configuration: SoftwareDeliveryMachineConfiguration): SoftwareDeliveryMachine {
 
     const sdm = createSoftwareDeliveryMachine({
-            name: "Spring/PCF Demo Software Delivery Machine",
-            configuration,
-        },
+        name: "Spring/PCF Demo Software Delivery Machine",
+        configuration,
+    },
     );
 
     sdm.withPushRules(
@@ -59,7 +59,7 @@ export function machine(configuration: SoftwareDeliveryMachineConfiguration): So
 
     addSpringSupport(sdm);
 
-    sdm.addCodeTransformCommand<{filename: string}>({
+    sdm.addCodeTransformCommand<{ filename: string }>({
         name: "counter",
         intent: "add count",
         parameters: {
