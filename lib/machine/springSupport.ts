@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-import { GitHubRepoRef, } from "@atomist/automation-client";
-import { SoftwareDeliveryMachine } from "@atomist/sdm";
+import { GitHubRepoRef } from "@atomist/automation-client";
+import { AutoCodeInspection, Autofix, SoftwareDeliveryMachine } from "@atomist/sdm";
 import { isInLocalMode } from "@atomist/sdm-core";
+import { Build } from "@atomist/sdm-pack-build";
 import { singleIssuePerCategoryManaging } from "@atomist/sdm-pack-issue";
 import {
     mavenBuilder,
@@ -27,12 +28,15 @@ import {
     springSupport,
     TransformSeedToCustomProject,
 } from "@atomist/sdm-pack-spring";
-import { autofix, build, codeInspection } from "./goals";
 import { MavenDefaultOptions } from "./maven";
 
-export function addSpringSupport(sdm: SoftwareDeliveryMachine) {
-
-    build.with({
+export function addSpringSupport(sdm: SoftwareDeliveryMachine, standardGoals: {
+    inspectGoal: AutoCodeInspection,
+    autofixGoal: Autofix
+    buildGoal: Build,
+}) {
+    const { buildGoal, autofixGoal, inspectGoal } = standardGoals;
+    buildGoal.with({
         ...MavenDefaultOptions,
         builder: mavenBuilder(),
     });
@@ -42,9 +46,9 @@ export function addSpringSupport(sdm: SoftwareDeliveryMachine) {
         intent: "create spring",
         description: "Create a new Java Spring Boot REST service",
         parameters: SpringProjectCreationParameterDefinitions,
-        startingPoint: GitHubRepoRef.from({
+        startingPoint: GitHubRepoRef.from({ // https://github.com/satellite-of-love/spring-rest-seed
             owner: "satellite-of-love",
-            repo: "spring-rest-seed", branch: "master"
+            repo: "spring-rest-seed", branch: "master",
         }),
         transform: [
             ReplaceReadmeTitle,
@@ -54,8 +58,8 @@ export function addSpringSupport(sdm: SoftwareDeliveryMachine) {
     });
 
     sdm.addExtensionPacks(springSupport({
-        inspectGoal: codeInspection,
-        autofixGoal: autofix,
+        inspectGoal,
+        autofixGoal,
         review: {
             cloudNative: true,
             springStyle: true,
